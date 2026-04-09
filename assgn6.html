@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Diffie-Hellman Key Exchange</title>
+    <script>
+        // Utility function: modular exponentiation
+        function modExp(base, exp, mod) {
+            let result = 1n;
+            base = BigInt(base) % BigInt(mod);
+            exp = BigInt(exp);
+            mod = BigInt(mod);
+            while (exp > 0n) {
+                if (exp % 2n === 1n) result = (result * base) % mod;
+                exp = exp / 2n;
+                base = (base * base) % mod;
+            }
+            return result;
+        }
+
+        function generateDH() {
+            // Public prime and generator
+            const p = 23n;  // small prime for demo
+            const g = 5n;   // generator
+
+            // Alice's private key
+            const a = BigInt(document.getElementById("aliceKey").value);
+            const A = modExp(g, a, p); // Alice's public key
+
+            // Bob's private key (random)
+            const b = BigInt(Math.floor(Math.random() * 10) + 1); 
+            const B = modExp(g, b, p); // Bob's public key
+
+            // Compute shared secret
+            const aliceShared = modExp(B, a, p);
+            const bobShared = modExp(A, b, p);
+
+            document.getElementById("output").innerHTML = `
+                Public Prime (p): ${p} <br>
+                Generator (g): ${g} <br>
+                Alice's Private Key (a): ${a} <br>
+                Alice's Public Key (A): ${A} <br>
+                Bob's Private Key (b): ${b} <br>
+                Bob's Public Key (B): ${B} <br>
+                Shared Secret (Alice): ${aliceShared} <br>
+                Shared Secret (Bob): ${bobShared} <br>
+                Shared secret matches? ${aliceShared === bobShared}
+            `;
+        }
+    </script>
+</head>
+<body>
+    <h2>Diffie-Hellman Key Exchange Demo</h2>
+    <p>Enter your private key (Alice):</p>
+    <input type="number" id="aliceKey" value="6" min="1" max="20">
+    <button onclick="generateDH()">Generate Shared Secret</button>
+
+    <h3>Output:</h3>
+    <div id="output"></div>
+</body>
+</html>
